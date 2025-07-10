@@ -1,20 +1,83 @@
 import { Router } from 'express';
-import { login, refresh, getProfile } from '../../controllers/auth.controller.js';
-import { authMiddleware } from '../../middleware/auth.middleware.js'; // Placeholder for JWT validation
+import { body } from 'express-validator';
+import { 
+  register, 
+  login, 
+  refresh, 
+  logout, 
+  forgotPassword, 
+  resetPassword,
+  verifyEmail,
+  googleAuth,
+  googleCallback
+} from '../controllers/auth.controller.js';
+import { validateRequest } from '../middleware/validation.middleware.js';
+import { authMiddleware } from '../middleware/auth.middleware.js';
 
-export const authRouter = Router();
+const router = Router();
 
-// POST /api/auth/login
-authRouter.post('/login', login);
+// Validation rules
+const registerValidation = [
+  body('username')
+    .isLength({ min: 3, max: 30 })
+    .matches(/^[a-zA-Z0-9_]+$/)
+    .withMessage('Username must be 3-30 characters and contain only letters, numbers, and underscores'),
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email'),
+  body('password')
+    .isLength({ min: 8 })
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('Password must be at least 8 characters and contain uppercase, lowercase, number, and special character')
+];
 
-// POST /api/auth/refresh
-authRouter.post('/refresh', refresh);
+const loginValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email'),
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required')
+];
 
-// GET /api/auth/profile
-authRouter.get('/profile', authMiddleware, getProfile);
+const forgotPasswordValidation = [
+  body('email')
+    .isEmail()
+    .normalizeEmail()
+    .withMessage('Please provide a valid email')
+];
 
-// POST /api/auth/logout - Note: Logout is typically handled client-side by deleting tokens.
-authRouter.post('/logout', (req, res) => {
-  // Optional: Add token to a blacklist in Redis
-  res.status(200).json({ message: 'Logged out successfully' });
+const resetPasswordValidation = [
+  body('token')
+    .notEmpty()
+    .withMessage('Reset token is required'),
+  body('password')
+    .isLength({ min: 8 })
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+    .withMessage('Password must be at least 8 characters and contain uppercase, lowercase, number, and special character')
+];
+
+// Routes
+router.post('/register', registerValidation, validateRequest, register);
+router.post('/login', loginValidation, validateRequest, login);
+router.post('/refresh', refresh);
+router.post('/logout', authMiddleware, logout);
+router.post('/forgot-password', forgotPasswordValidation, validateRequest, forgotPassword);
+router.post('/reset-password', resetPasswordValidation, validateRequest, resetPassword);
+router.get('/verify-email/:token', verifyEmail);
+
+// OAuth routes
+router.get('/google', googleAuth);
+router.get('/google/callback', googleCallback);
+
+// Protected routes
+router.get('/me', authMiddleware, (req, res) => {
+  res.json({
+    success: true,
+    user: req.user
+  });
 });
+
+export { router as authRoutes };
