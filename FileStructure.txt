@@ -1,0 +1,18 @@
+authentication-service/
+├── src/
+│   ├── api/
+│   │   └── routes/             # Express routes
+│   │       └── auth.routes.js
+│   ├── config/                 # Environment variables and config
+│   │   └── index.js
+│   ├── controllers/            # Route handlers (logic)
+│   │   └── auth.controller.js
+│   ├── models/                 # Database models (e.g., Sequelize/Prisma)
+│   │   └── user.model.js
+│   ├── services/               # Business logic services
+│   │   └── token.service.js
+│   ├── utils/                  # Utility functions
+│   │   └── AppError.js
+│   └── index.js                # Service entry point
+├── Dockerfile                  # Containerization script
+└── package.json

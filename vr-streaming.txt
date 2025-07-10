@@ -1,0 +1,25 @@
+vr-streaming-platform/
+├── .github/                  # CI/CD workflows (e.g., GitHub Actions)
+│   └── workflows/
+│       └── ci.yml
+├── services/                 # Parent directory for all microservices
+│   ├── authentication-service/ # Handles users, auth, and roles
+│   ├── session-service/        # Manages user streaming sessions
+│   ├── environment-service/    # Manages VR environment assets
+│   ├── streaming-core/         # Placeholder for the core engine service
+│   └── ...                     # Other services
+├── clients/                  # Frontend applications
+│   ├── admin-panel/            # Web-based admin dashboard
+│   └── user-client/            # Oculus Quest 3 client project (Unity/Unreal)
+├── infrastructure/           # Kubernetes, Terraform, and other IaC files
+│   ├── kubernetes/
+│   │   ├── core/
+│   │   └── services/
+│   └── terraform/
+├── packages/                 # Shared libraries used across services
+│   ├── api-types/              # Shared TypeScript/JSDoc types for APIs
+│   └── logger/                 # Centralized logging utility
+├── docker-compose.yml        # For local development environment
+├── package.json              # Root package.json for monorepo workspaces
+├── .gitignore
+└── README.md                 # Project overview and setup instructions
